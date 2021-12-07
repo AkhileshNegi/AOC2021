@@ -31,12 +31,34 @@ defmodule Aoc2021.Day3 do
     |> Enum.reduce(@init, fn bit, acc ->
       process_bits(bit, acc)
     end)
-
-    # |> process_final()
+    |> process_gamma_rate()
   end
 
-  defp process_final(result) do
-    result.horizontal * result.vertical
+  defp process_gamma_rate(result) do
+    1..12
+    |> Enum.reduce("", fn key, acc ->
+      result
+      |> Map.get(key)
+      |> compute_gamma_rate(acc)
+    end)
+    |> mirror_bits()
+  end
+
+  defp mirror_bits(value) do
+    bit_value =
+      0..11
+      |> Enum.reduce("", fn key, acc ->
+        mirror_value = if String.at(value, key) == "0", do: "1", else: "0"
+        "#{acc}#{mirror_value}"
+      end)
+      |> String.to_integer(2)
+
+    bit_value * String.to_integer(value, 2)
+  end
+
+  defp compute_gamma_rate(%{0 => zeros, 1 => ones}, acc) do
+    new_bit = if zeros > ones, do: "0", else: "1"
+    "#{acc}#{new_bit}"
   end
 
   defp process_bits(bit, bit_count) do
